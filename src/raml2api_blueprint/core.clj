@@ -10,9 +10,8 @@
 (defn walk-responses [yaml]
   (doseq [[http-code bodies] yaml]
     (doseq [[content-type body] bodies]
-      (println (format "+ Response %s (%s)" http-code content-type))
-      ))
-  )
+      (println (format "+ Response %s (%s)\n" http-code content-type))
+      )))
 
 (defn walk-body [yaml]
   (doseq [[content-type body] yaml
@@ -25,23 +24,22 @@
   (println))
 
 (defn walk [yaml path-context]
-  (doseq [[yaml-key yaml-value] yaml
-          :let [strkey (string/join (drop 1 (.toString yaml-key)))]]
+  (doseq [[yaml-key yaml-value] yaml]
     (cond
-      (= (first strkey) \/)
-        (do (println "#" (string/join (concat path-context strkey)) "\n")
-            (walk yaml-value (concat path-context strkey)))
-      (some #{strkey} http-methods)
+      (= (first yaml-key) \/)
+        (do (println "#" (string/join (concat path-context yaml-key)) "\n")
+            (walk yaml-value (concat path-context yaml-key)))
+      (some #{yaml-key} http-methods)
         (do
-            (println "##" (string/upper-case strkey) "\n")
-            (walk yaml-value (concat path-context strkey)))
-      (= strkey "description")
+            (println "##" (string/upper-case yaml-key) "\n")
+            (walk yaml-value (concat path-context yaml-key)))
+      (= yaml-key "description")
         (println yaml-value "\n")
-      (= strkey "body")
+      (= yaml-key "body")
         (walk-body yaml-value)
-      (= strkey "responses")
+      (= yaml-key "responses")
         (walk-responses yaml-value)
-      :else (println "wtf" strkey)
+      :else (println "wtf" yaml-key)
       )))
 
 (defn walk-top [yaml]
@@ -51,4 +49,4 @@
 (defn -main
   "Convert a raml file to api-blueprint."
   [& args]
-  (walk-top (yaml/parse-string (slurp (first args)))))
+  (walk-top (yaml/parse-string (slurp (first args)) false)))
