@@ -43,8 +43,8 @@
       )))
 
 (defn walk-top [yaml]
-  (println "#" (yaml :title) "version" (yaml :version))
-  (walk (dissoc yaml :title :version) ()))
+  (println "#" (yaml "title") "version" (yaml "version") "\n")
+  (walk (dissoc yaml "title" "version") ()))
 
 (defn -main
   "Convert a raml file to api-blueprint."
