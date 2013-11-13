@@ -15,12 +15,12 @@
 
 (defn walk-body [yaml]
   (doseq [[content-type body] yaml
-          :let [schema (body :schema)]]
+          :let [schema (body "schema")]]
     (println (format "+ Request (%s)" content-type))
     (when schema
       (println "    + Schema\n")
       (doseq [line (string/split-lines schema)]
-        (println "       " line))))
+        (println "            " line))))
   (println))
 
 (defn walk [yaml path-context]
